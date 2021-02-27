@@ -23,7 +23,7 @@ const mongoose = require('mongoose');
 
 const basePath = 'mongodb+srv://Jagannath:Baggage_1@cluster0-w8l56.mongodb.net/Baggage?retryWrites=true&w=majority'
 
-mongoose.connect(basePath,{useNewUrlParser: true, useUnifiedTopology: true}, (error) => {
+mongoose.connect(basePath, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }, (error) => {
     if (error) {
         console.log('Error! ' + error);
     } else {
@@ -126,29 +126,57 @@ router.post('/login', (request, response) => {
 //  Validate an user start (login) end
 ///////////////////////////////////////////////
 
+
+//////////////////////////////////////////////
 // Get Single user start
-router.post('/singleUser', (req, res) => {
-    let userData = req.body;
-
-    let user = new User(userData);
-
+router.get('/singleUser', (req, res) => {
+    let userData = req.query.email;
     User.findOne({
-        email: userData.email
+        email: userData
     }, (error, user) => {
         if (error) {
             console.log(error);
-        } 
+        }
         else {
             res.status(200).send({
                 user
             });
-            console.log(user)
-          }
-     });
+
+        }
+    });
 
 })
 // Get Single user end
 //////////////////////////////////////////////
+
+router.put('/singleUserUpdate', (req, res) => {
+    let userData = req.body;
+    // console.log(userData)
+    User.update({
+        _id: userData._id
+    }, {
+        $set:
+            userData
+    }, (error, user) => {
+        if (error) {
+            console.log(error);
+        }
+        else {
+            res.status(200).send(
+                { user }
+            );
+
+        }
+    })
+
+})
+
+//////////////////////////////////////////////
+// Update Single user start
+
+// Update Single user end
+
+
 // Puma section start
 
 router.post('/registerpuma', (request, response) => {

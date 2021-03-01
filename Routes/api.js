@@ -3,6 +3,12 @@ const router = express.Router();
 // Json web token instance
 const jwt = require('jsonwebtoken');
 
+// imported Multer module here
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+
 const User = require("../Models/user");
 const Puma = require("../Models/Brands/puma");
 const Levis = require("../Models/Brands/levis");
@@ -10,6 +16,7 @@ const Easybuy = require("../Models/Brands/easybuy");
 const Hm = require("../Models/Brands/hm");
 const Trends = require("../Models/Brands/trends");
 const Unlimited = require("../Models/Brands/unlimited");
+
 
 
 router.get('/', (request, response) => {
@@ -61,6 +68,28 @@ function verifyToken(req, res, next) {
 
 // verify bearer token end
 //////////////////////////////////////////////
+
+
+
+// Regestring multer start here
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "uploads");
+    },
+    filename: function (req, file, cb) {
+        cb(null, `${file.originalname}_${Date.now()}${path.extname(file.originalname)}`)
+    }
+});
+
+
+var upload = multer(
+    {
+        storage: storage
+    }
+)
+
+router.use('/profileImg', express.static('uploads'))
 
 
 /////////////////////////////////////////////
@@ -149,6 +178,7 @@ router.get('/singleUser', (req, res) => {
 // Get Single user end
 //////////////////////////////////////////////
 
+// Update Single user start
 router.put('/singleUserUpdate', (req, res) => {
     let userData = req.body;
     // console.log(userData)
@@ -172,9 +202,63 @@ router.put('/singleUserUpdate', (req, res) => {
 })
 
 //////////////////////////////////////////////
-// Update Single user start
+
 
 // Update Single user end
+
+/////////////////////////////////////////////
+// Update Single user start
+
+router.post('/uploadphoto', upload.single('profileImg'), (req, res) => {
+
+    console.log(req.file)
+
+
+    res.json({
+        success: 1,
+        "profile_url": `http://localhost:4000/profileImg/${req.file.filename}`
+    })
+    // var userData = req.file;
+    // console.log(userData._id)
+
+    // var img = fs.readFileSync(req.file.path);
+    // var encode_image = img.toString('base64');
+
+    // defining a json image
+
+    // var finalImage = {
+    //     connectType: req.file.mimetype,
+    //     path: req.file.path,
+    //     image: new Buffer(encode_image, 'base64')
+
+    // }
+
+    // const imagedetails = JSON.stringify(finalImage);
+    // console.log(imagedetails)
+    // User.update({
+    //     _id: userData._id
+    // }, {
+    //     $set: {
+    //         profileImg: imagedetails
+    //     }
+
+    // }, (error, user) => {
+    //     if (error) {
+    //         res.status(403).send(
+    //             "Image upload failed"
+    //         );
+    //     }
+    //     else {
+    //         res.status(200).send(
+    //             "image uploaded successfully"
+    //         ).send({ user });
+
+    //     }
+    // })
+})
+
+// Update Single user end
+/////////////////////////////////////////////
 
 
 // Puma section start
